@@ -8,6 +8,8 @@
 <body>
   <div class="card">
     <h1>Depósito a Ronin Wallet</h1>
+    <p id="roninAddress"></p>
+    <p id="roninBalance"></p>
     <button id="depositBtn">Realizar depósito</button>
   </div>
   
@@ -20,24 +22,21 @@
       ronin.connect()
         .then(function() {
           // Obtener la dirección de Ronin Wallet del usuario
-          var roninAddress = prompt('ronin:2c6963962ee51471211166ceaa1dc91d4d7a0c46');
-          // Verificar si se ingresó una dirección válida
-          if (roninAddress !== null && roninAddress !== '') {
-            // Realizar el depósito
-            ronin.deposit({
-              to: roninAddress,
-              value: '0.01', // Monto del depósito en ETH (puedes ajustarlo según tus necesidades)
-              message: 'Depósito a Ronin Wallet' // Mensaje para la transacción
-            })
-            .then(function(txHash) {
-              // Mostrar un mensaje de éxito
-              alert('El depósito se realizó con éxito. Hash de transacción: ' + txHash);
+          var roninAddress = ronin.address;
+          // Mostrar la dirección de la billetera
+          document.getElementById('roninAddress').textContent = 'Dirección de Ronin Wallet: ' + roninAddress;
+          // Obtener el saldo del usuario
+          ronin.getBalance()
+            .then(function(balance) {
+              // Mostrar el saldo del usuario
+              document.getElementById('roninBalance').textContent = 'Saldo de Ronin Wallet: ' + balance + ' ETH';
+              // Realizar el depósito
+              // Puedes colocar aquí el código para realizar el depósito a la dirección de Ronin Wallet obtenida
             })
             .catch(function(error) {
-              // Mostrar un mensaje de error
-              alert('Error al realizar el depósito: ' + error);
+              // Mostrar un mensaje de error si no se pudo obtener el saldo
+              alert('Error al obtener el saldo: ' + error);
             });
-          }
         })
         .catch(function(error) {
           // Mostrar un mensaje de error si no se pudo conectar con la extensión de Ronin Wallet
@@ -58,6 +57,10 @@
 
     h1 {
       font-size: 24px;
+    }
+
+    p {
+      margin-top: 10px;
     }
 
     button {
