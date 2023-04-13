@@ -1,63 +1,66 @@
-<div class="card">
-  <h2>Depósito a Ronin Wallet</h2>
-  <p>Conecta con la extensión de Ronin Wallet y realiza un depósito.</p>
-  <button id="deposit-button">Conectar con Ronin Wallet</button>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Depósito a Ronin Wallet</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Depósito a Ronin Wallet</h1>
+    <button id="depositBtn">Realizar depósito</button>
+  </div>
+  
+  <script>
+    // Escuchar el evento de clic en el botón de depósito
+    document.getElementById('depositBtn').addEventListener('click', function() {
+      // Verificar si la extensión de Ronin Wallet está instalada
+      if (typeof window.ronin !== 'undefined') {
+        // Obtener la dirección de Ronin Wallet del usuario
+        var roninAddress = prompt('ronin:2c6963962ee51471211166ceaa1dc91d4d7a0c46');
+        // Verificar si se ingresó una dirección válida
+        if (roninAddress !== null && roninAddress !== '') {
+          // Abrir la ventana emergente de Ronin Wallet para realizar el depósito
+          window.ronin.sendTransaction({
+            to: roninAddress,
+            value: '0.01', // Monto del depósito en ETH (puedes ajustarlo según tus necesidades)
+            message: 'Depósito a Ronin Wallet' // Mensaje para la transacción
+          });
+        }
+      } else {
+        // Mostrar un mensaje de error si la extensión de Ronin Wallet no está instalada
+        alert('La extensión de Ronin Wallet no está instalada.');
+      }
+    });
+  </script>
 
-<script>
-  // Función para manejar el clic en el botón de depósito
-  document.getElementById('deposit-button').addEventListener('click', function() {
-    // Verificar si la extensión de Ronin Wallet está instalada
-    if (typeof window.ethereum === 'undefined') {
-      alert('Por favor, instala la extensión de Ronin Wallet en tu navegador.');
-      return;
+  <style>
+    .card {
+      width: 300px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f8f8f8;
+      border-radius: 5px;
+      text-align: center;
     }
-    
-    // Solicitar acceso a la extensión de Ronin Wallet
-    window.ethereum.request({ method: 'eth_requestAccounts' })
-      .then(function(accounts) {
-        // Obtener la dirección de la cuenta conectada
-        const account = accounts[0];
-        
-        // Aquí puedes agregar la lógica para realizar el depósito a la dirección de Ronin
-        // Puedes usar una biblioteca como Web3.js o Ethers.js para interactuar con la red de Ronin
-        
-        // Ejemplo: mostrar un mensaje de éxito
-        alert(`Conexión exitosa con Ronin Wallet. Dirección de cuenta: ${account}`);
-      })
-      .catch(function(error) {
-        // Manejar errores
-        alert(`Error al conectar con Ronin Wallet: ${error.message}`);
-      });
-  });
-</script>
 
-<style>
-  .card {
-    padding: 20px;
-    background-color: #f8f8f8;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  
-  h2 {
-    margin-top: 0;
-  }
-  
-  button {
-    display: block;
-    margin-top: 10px;
-    padding: 8px 12px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-</style>
+    h1 {
+      font-size: 24px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</body>
+</html>
