@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Depósito a Ronin Wallet</title>
+  <script src="https://roninwallet.com/sdk/latest"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,12 +20,30 @@
         var roninAddress = prompt('ronin:2c6963962ee51471211166ceaa1dc91d4d7a0c46');
         // Verificar si se ingresó una dirección válida
         if (roninAddress !== null && roninAddress !== '') {
-          // Abrir la ventana emergente de Ronin Wallet para realizar el depósito
-          window.ronin.sendTransaction({
-            to: roninAddress,
-            value: '0.01', // Monto del depósito en ETH (puedes ajustarlo según tus necesidades)
-            message: 'Depósito a Ronin Wallet' // Mensaje para la transacción
-          });
+          // Crear una instancia de Ronin Wallet SDK
+          var ronin = new Ronin();
+          // Conectar con la extensión de Ronin Wallet
+          ronin.connect()
+            .then(function() {
+              // Realizar el depósito
+              ronin.deposit({
+                to: roninAddress,
+                value: '0.01', // Monto del depósito en ETH (puedes ajustarlo según tus necesidades)
+                message: 'Depósito a Ronin Wallet' // Mensaje para la transacción
+              })
+              .then(function(txHash) {
+                // Mostrar un mensaje de éxito
+                alert('El depósito se realizó con éxito. Hash de transacción: ' + txHash);
+              })
+              .catch(function(error) {
+                // Mostrar un mensaje de error
+                alert('Error al realizar el depósito: ' + error);
+              });
+            })
+            .catch(function(error) {
+              // Mostrar un mensaje de error si no se pudo conectar con la extensión de Ronin Wallet
+              alert('Error al conectar con Ronin Wallet: ' + error);
+            });
         }
       } else {
         // Mostrar un mensaje de error si la extensión de Ronin Wallet no está instalada
@@ -56,10 +75,6 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
     }
   </style>
 </body>
