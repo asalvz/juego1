@@ -11,8 +11,14 @@
                     .then(() => {
                         // Conexión exitosa, obtener la dirección y saldo de la billetera
                         const address = Ronin.getAddress();
-                        const balance = Ronin.getBalance();
-                        alert(`Conexión exitosa con Ronin Wallet\n\nDirección de la billetera: ${address}\nSaldo en WETH: ${balance}`);
+                        Ronin.getBalance()
+                            .then(balance => {
+                                alert(`Conexión exitosa con Ronin Wallet\n\nDirección de la billetera: ${address}\nSaldo en WETH: ${balance}`);
+                            })
+                            .catch(error => {
+                                console.error(error);
+                                alert('Error al obtener el saldo de la billetera');
+                            });
                     })
                     .catch((error) => {
                         // Manejo de errores en la conexión
