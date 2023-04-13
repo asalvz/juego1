@@ -1,86 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Depósito a Ronin Wallet</title>
-  <script src="https://roninwallet.com/sdk/latest"></script>
-  <link rel="stylesheet" href="styles.css">
+    <title>Conexión con Ronin Wallet</title>
+    <script src="https://roninwallet.com/sdk/latest"></script>
+    <script>
+        // Función para conectar con Ronin Wallet
+        function connectRoninWallet() {
+            if (typeof Ronin !== 'undefined') {
+                Ronin.connect()
+                    .then(() => {
+                        // Conexión exitosa, obtener la dirección y saldo de la billetera
+                        const address = Ronin.getAddress();
+                        const balance = Ronin.getBalance();
+                        alert(`Conexión exitosa con Ronin Wallet\n\nDirección de la billetera: ${address}\nSaldo en WETH: ${balance}`);
+                    })
+                    .catch((error) => {
+                        // Manejo de errores en la conexión
+                        console.error(error);
+                        alert('Error al conectar con Ronin Wallet');
+                    });
+            } else {
+                alert('La extensión de Ronin Wallet no está instalada. Por favor, instálala antes de continuar.');
+            }
+        }
+    </script>
 </head>
 <body>
-  <div class="card">
-    <h1>Depósito a Ronin Wallet</h1>
-    <p id="roninAddress"></p>
-    <p id="roninBalance"></p>
-    <button id="connectBtn">Vincular Ronin Wallet</button>
-    <button id="depositBtn">Realizar depósito</button>
-  </div>
-  
-  <script>
-    // Crear una instancia de Ronin Wallet SDK
-    var ronin = new Ronin();
-    
-    // Escuchar el evento de clic en el botón de vinculación
-    document.getElementById('connectBtn').addEventListener('click', function() {
-      // Conectar con la extensión de Ronin Wallet
-      ronin.connect()
-        .then(function() {
-          // Obtener la dirección de Ronin Wallet del usuario
-          var roninAddress = ronin.address;
-          // Mostrar la dirección de la billetera
-          document.getElementById('roninAddress').textContent = 'Dirección de Ronin Wallet: ' + roninAddress;
-          // Obtener el saldo del usuario en WETH
-          ronin.getBalance('weth')
-            .then(function(balance) {
-              // Mostrar el saldo del usuario en WETH
-              document.getElementById('roninBalance').textContent = 'Saldo de Ronin Wallet (WETH): ' + balance + ' WETH';
-            })
-            .catch(function(error) {
-              // Mostrar un mensaje de error si no se pudo obtener el saldo
-              alert('Error al obtener el saldo: ' + error);
-            });
-        })
-        .catch(function(error) {
-          // Mostrar un mensaje de error si no se pudo conectar con la extensión de Ronin Wallet
-          alert('Error al conectar con Ronin Wallet: ' + error);
-        });
-    });
-
-    // Escuchar el evento de clic en el botón de depósito
-    document.getElementById('depositBtn').addEventListener('click', function() {
-      // Realizar el depósito
-      var depositAmount = 1; // Monto de depósito en ETH (puedes ajustarlo a tu preferencia)
-      ronin.deposit(depositAmount)
-        .then(function() {
-          // Mostrar un mensaje de éxito si se realizó el depósito
-          alert('Depósito exitoso!');
-        })
-        .catch(function(error) {
-          // Mostrar un mensaje de error si no se pudo realizar el depósito
-          alert('Error al realizar el depósito: ' + error);
-        });
-    });
-  </script>
-
-  <style>
-    .card {
-      width: 300px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f8f8f8;
-      border-radius: 5px;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 24px;
-    }
-
-    p {
-      margin-top: 10px;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #007bff;
-      color:
+    <h1>Conexión con Ronin Wallet</h1>
+    <button onclick="connectRoninWallet()">Conectar con Ronin Wallet</button>
+</body>
+</html>
