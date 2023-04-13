@@ -31,7 +31,16 @@
               // Mostrar el saldo del usuario
               document.getElementById('roninBalance').textContent = 'Saldo de Ronin Wallet: ' + balance + ' ETH';
               // Realizar el depósito
-              // Puedes colocar aquí el código para realizar el depósito a la dirección de Ronin Wallet obtenida
+              var depositAmount = 1; // Monto de depósito en ETH (puedes ajustarlo a tu preferencia)
+              ronin.deposit(depositAmount)
+                .then(function() {
+                  // Mostrar un mensaje de éxito si se realizó el depósito
+                  alert('Depósito exitoso!');
+                })
+                .catch(function(error) {
+                  // Mostrar un mensaje de error si no se pudo realizar el depósito
+                  alert('Error al realizar el depósito: ' + error);
+                });
             })
             .catch(function(error) {
               // Mostrar un mensaje de error si no se pudo obtener el saldo
