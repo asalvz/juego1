@@ -14,41 +14,35 @@
   <script>
     // Escuchar el evento de clic en el botón de depósito
     document.getElementById('depositBtn').addEventListener('click', function() {
-      // Verificar si la extensión de Ronin Wallet está instalada
-      if (typeof window.ronin !== 'undefined') {
-        // Obtener la dirección de Ronin Wallet del usuario
-        var roninAddress = prompt('ronin:2c6963962ee51471211166ceaa1dc91d4d7a0c46');
-        // Verificar si se ingresó una dirección válida
-        if (roninAddress !== null && roninAddress !== '') {
-          // Crear una instancia de Ronin Wallet SDK
-          var ronin = new Ronin();
-          // Conectar con la extensión de Ronin Wallet
-          ronin.connect()
-            .then(function() {
-              // Realizar el depósito
-              ronin.deposit({
-                to: roninAddress,
-                value: '0.01', // Monto del depósito en ETH (puedes ajustarlo según tus necesidades)
-                message: 'Depósito a Ronin Wallet' // Mensaje para la transacción
-              })
-              .then(function(txHash) {
-                // Mostrar un mensaje de éxito
-                alert('El depósito se realizó con éxito. Hash de transacción: ' + txHash);
-              })
-              .catch(function(error) {
-                // Mostrar un mensaje de error
-                alert('Error al realizar el depósito: ' + error);
-              });
+      // Crear una instancia de Ronin Wallet SDK
+      var ronin = new Ronin();
+      // Conectar con la extensión de Ronin Wallet
+      ronin.connect()
+        .then(function() {
+          // Obtener la dirección de Ronin Wallet del usuario
+          var roninAddress = prompt('Ingresa tu dirección de Ronin Wallet:');
+          // Verificar si se ingresó una dirección válida
+          if (roninAddress !== null && roninAddress !== '') {
+            // Realizar el depósito
+            ronin.deposit({
+              to: roninAddress,
+              value: '0.01', // Monto del depósito en ETH (puedes ajustarlo según tus necesidades)
+              message: 'Depósito a Ronin Wallet' // Mensaje para la transacción
+            })
+            .then(function(txHash) {
+              // Mostrar un mensaje de éxito
+              alert('El depósito se realizó con éxito. Hash de transacción: ' + txHash);
             })
             .catch(function(error) {
-              // Mostrar un mensaje de error si no se pudo conectar con la extensión de Ronin Wallet
-              alert('Error al conectar con Ronin Wallet: ' + error);
+              // Mostrar un mensaje de error
+              alert('Error al realizar el depósito: ' + error);
             });
-        }
-      } else {
-        // Mostrar un mensaje de error si la extensión de Ronin Wallet no está instalada
-        alert('La extensión de Ronin Wallet no está instalada.');
-      }
+          }
+        })
+        .catch(function(error) {
+          // Mostrar un mensaje de error si no se pudo conectar con la extensión de Ronin Wallet
+          alert('Error al conectar con Ronin Wallet: ' + error);
+        });
     });
   </script>
 
