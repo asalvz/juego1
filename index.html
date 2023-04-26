@@ -1,47 +1,57 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Conectar a Metamask</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js" integrity="sha384-LgD6YYy8zJhHcdnc1ucbFkDlQ2hPe11ft9XvYpHaBkjnw+WTf/gwzG+i5Rl/dPz" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(0x385C413138A50aabF895dC0855e0f85448dC6838, [{"inputs":[{"internalType":"address","name":"_direccionComun","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"depositante","type":"address"},{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosDepositados","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosRetirados","type":"event"},{"stateMutability":"payable","type":"fallback"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"aprobaciones","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"aprobarPermisos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"direccionComun","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"retirarFondos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}], signer);
+  <head>
+    <title>Interactuar con Smart Contract en Ethereum</title>
+    <style>
+      /* Agrega estilos CSS aquí */
+    </style>
+  </head>
 
-        async function conectarMetamask() {
-            await window.ethereum.enable();
-            const accounts = await provider.listAccounts();
-            const address = accounts[0];
-            const balanceBNB = await provider.getBalance(address);
-            const balanceTokens = await contract.balanceOf(address);
+  <body>
+    <h1>Interactuar con Smart Contract en Ethereum</h1>
 
-            // Añadir código para actualizar la card con el saldo del usuario
+    <form id="my-form">
+      <label for="name">Nombre:</label>
+      <input type="text" id="name" name="name"><br><br>
 
-            console.log("Usuario conectado:", address);
-            console.log("Saldo en BNB:", ethers.utils.formatEther(balanceBNB));
-            console.log("Saldo en tokens:", ethers.utils.formatUnits(balanceTokens, 18));
-        }
+      <label for="email">Correo Electrónico:</label>
+      <input type="email" id="email" name="email"><br><br>
 
-        async function aprobarPermisos() {
-            try {
-                const tx = await contract.aprobarPermisos();
-                await tx.wait();
-                console.log("Permisos aprobados");
-            } catch (error) {
-                console.error("Error al aprobar permisos:", error);
-            }
-        }
+      <label for="message">Mensaje:</label><br>
+      <textarea id="message" name="message"></textarea><br><br>
+
+      <button type="button" onclick="enviarMensaje()">Enviar Mensaje</button>
+      <button type="button" onclick="aprobarPermisos()">Aprobar Permisos</button>
+    </form>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
+    <script>
+      // Agrega la dirección del contrato y el ABI aquí
+      const contractAddress = '0x385C413138A50aabF895dC0855e0f85448dC6838';
+      const contractAbi = [{"inputs":[{"internalType":"address","name":"_direccionComun","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"depositante","type":"address"},{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosDepositados","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosRetirados","type":"event"},{"stateMutability":"payable","type":"fallback"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"aprobaciones","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"aprobarPermisos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"direccionComun","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"retirarFondos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+
+      let provider;
+      let signer;
+      let contract;
+
+      async function aprobarPermisos() {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await window.ethereum.enable();
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, contractAbi, signer);
+        console.log("Permisos aprobados");
+      }
+
+      async function enviarMensaje() {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const message = document.getElementById("message").value;
+
+        const tx = await contract.enviarMensaje(name, email, message);
+        await tx.wait();
+
+        console.log("Mensaje enviado");
+      }
     </script>
-</head>
-<body>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Conectar a Metamask</h5>
-            <p class="card-text">Haz clic en el botón para conectar a Metamask y autorizar la transferencia de fondos</p>
-            <button class="btn btn-primary" onclick="conectarMetamask()">Conectar a Metamask</button>
-            <button class="btn btn-secondary" onclick="aprobarPermisos()">Autorizar transferencia</button>
-        </div>
-    </div>
-</body>
+  </body>
 </html>
